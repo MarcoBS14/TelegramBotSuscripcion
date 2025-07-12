@@ -6,9 +6,7 @@ from telegram.ext import (
     ApplicationBuilder,
     CommandHandler,
     CallbackQueryHandler,
-    MessageHandler,
     ContextTypes,
-    filters,
 )
 
 # Cargar variables de entorno
@@ -16,60 +14,32 @@ load_dotenv()
 TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 ADMIN_CHAT_ID = int(os.getenv("ADMIN_CHAT_ID"))
 
-# Diccionario de estados temporales por usuario
-dynamic_state = {}
-
 # Normalizar texto
 def normalizar(texto):
     texto = texto.lower().strip()
     return ''.join(c for c in unicodedata.normalize('NFD', texto) if unicodedata.category(c) != 'Mn')
 
-# Teclado principal con botones Inline (una fila por botón)
+# Menú principal
 def main_menu_inline():
     return InlineKeyboardMarkup([
         [InlineKeyboardButton("📈 Información grupo premium", callback_data="info_premium")],
         [InlineKeyboardButton("❓ Preguntas frecuentes", callback_data="preguntas_frecuentes")]
     ])
 
-# Submenú de preguntas frecuentes
+# Submenú actualizado
 def faq_menu_inline():
     return InlineKeyboardMarkup([
         [InlineKeyboardButton("📊 % de ganancias", callback_data="faq_ganancias")],
         [InlineKeyboardButton("🏦 Plataforma de apuestas", callback_data="faq_plataformas")],
-        [InlineKeyboardButton("❓ Duda de pick", callback_data="faq_pick")],
-        [InlineKeyboardButton("💬 Otra pregunta", callback_data="faq_otra")],
+        [InlineKeyboardButton("💬 Contactar soporte", url="https://t.me/MarcoBS14")],
         [InlineKeyboardButton("🔙 Menú principal", callback_data="volver_inicio")]
     ])
 
-# Comando /start
+# /start
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user_id = update.effective_user.id
-    dynamic_state.pop(user_id, None)
     await update.message.reply_text("👋 ¿Cómo puedo ayudarte hoy?", reply_markup=main_menu_inline())
 
-# Manejar mensajes de texto cuando se espera respuesta del usuario
-async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user_id = update.effective_user.id
-    username = update.effective_user.username or "Sin username"
-    nombre = update.effective_user.full_name or "Sin nombre"
-    text_raw = update.message.text.strip()
-
-    if user_id in dynamic_state:
-        motivo = dynamic_state.pop(user_id)
-        mensaje = (
-            f"📩 Nueva duda de cliente:\n"
-            f"👤 Nombre: {nombre}\n"
-            f"🆔 ID de Telegram: {user_id}\n"
-            f"🔗 Usuario: @{username}\n"
-            f"📌 Motivo: {motivo}\n"
-            f"✉️ Mensaje: {text_raw}"
-        )
-        await context.bot.send_message(chat_id=ADMIN_CHAT_ID, text=mensaje)
-        await update.message.reply_text("Gracias, un administrador te responderá pronto.")
-    else:
-        await update.message.reply_text("👋 ¿Cómo puedo ayudarte hoy?", reply_markup=main_menu_inline())
-
-# Manejo de botones Inline
+# Botones Inline
 async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     user_id = query.from_user.id
@@ -100,26 +70,18 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await query.edit_message_text(text=texto, parse_mode="HTML", reply_markup=faq_menu_inline())
 
     elif query.data == "faq_plataformas":
-        await query.edit_message_text(
-            "🏦 Usamos principalmente <b>Bet365</b> y <b>Playdoit</b>, pero puedes usar cualquier casa que permita apuestas a jugadores.",
-            parse_mode="HTML", reply_markup=faq_menu_inline())
-
-    elif query.data == "faq_pick":
-        dynamic_state[user_id] = "Duda sobre pick"
-        await query.edit_message_text("📝 Por favor, escribe tu duda sobre algún pick.")
-    
-    elif query.data == "faq_otra":
-        dynamic_state[user_id] = "Otra pregunta general"
-        await query.edit_message_text("🗨️ Por favor, escribe tu pregunta.")
+        texto = (
+            "🏦 Usamos principalmente <b>Bet365</b> y <b>Playdoit</b>, pero puedes usar cualquier casa que permita apuestas a jugadores."
+        )
+        await query.edit_message_text(text=texto, parse_mode="HTML", reply_markup=faq_menu_inline())
 
     elif query.data == "volver_inicio":
         await query.edit_message_text("👋 ¿Cómo puedo ayudarte hoy?", reply_markup=main_menu_inline())
 
-# Lanzar el bot
+# Ejecutar bot
 if __name__ == "__main__":
     print("✅ Bot corriendo en modo polling...")
     app = ApplicationBuilder().token(TOKEN).build()
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CallbackQueryHandler(button_handler))
-    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
     app.run_polling()
