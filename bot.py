@@ -7,6 +7,8 @@ from telegram.ext import (
     CommandHandler,
     CallbackQueryHandler,
     ContextTypes,
+    MessageHandler,
+    filters
 )
 
 # Cargar variables de entorno
@@ -78,10 +80,15 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif query.data == "volver_inicio":
         await query.edit_message_text("👋 ¿Cómo puedo ayudarte hoy?", reply_markup=main_menu_inline())
 
+# Manejar mensajes de texto que no sean comandos
+async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text("👋 ¿Cómo puedo ayudarte hoy?", reply_markup=main_menu_inline())
+
 # Ejecutar bot
 if __name__ == "__main__":
     print("✅ Bot corriendo en modo polling...")
     app = ApplicationBuilder().token(TOKEN).build()
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CallbackQueryHandler(button_handler))
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_text))
     app.run_polling()
