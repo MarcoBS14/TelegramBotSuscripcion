@@ -28,7 +28,7 @@ def main_menu_inline():
         [InlineKeyboardButton("❓ Preguntas frecuentes", callback_data="preguntas_frecuentes")]
     ])
 
-# Submenú actualizado
+# Submenú actualizad
 def faq_menu_inline():
     return InlineKeyboardMarkup([
         [InlineKeyboardButton("📊 % de ganancias", callback_data="faq_ganancias")],
