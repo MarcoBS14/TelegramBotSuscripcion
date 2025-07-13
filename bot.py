@@ -28,12 +28,12 @@ def main_menu_inline():
         [InlineKeyboardButton("❓ Preguntas frecuentes", callback_data="preguntas_frecuentes")]
     ])
 
-# Submenú actualizad
+# Submenú actualizads
 def faq_menu_inline():
     return InlineKeyboardMarkup([
         [InlineKeyboardButton("📊 % de ganancias", callback_data="faq_ganancias")],
         [InlineKeyboardButton("🏦 Plataforma de apuestas", callback_data="faq_plataformas")],
-        [InlineKeyboardButton("💬 Contactar soporte", url="https://t.me/MarcoBS14")],
+        [InlineKeyboardButton("💬 Contactar soporte", url="https://t.me/mmsportplays")],
         [InlineKeyboardButton("🔙 Menú principal", callback_data="volver_inicio")]
     ])
 
