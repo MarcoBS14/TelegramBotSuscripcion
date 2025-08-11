@@ -53,10 +53,12 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"?notrack=true&telegram_id={user_id}"
         )
         texto = (
-            "👋 <b>Hola!</b>\n\n"
-            "💸 El costo de entrada al grupo es de <b>499 pesos mexicanos</b> (aproximadamente <b>25 USD</b>) mensuales.\n"
+            "👋 <b>¡Hola!</b>\n\n"
+            "💸 <b>Promo especial solo hoy (11 de agosto):</b> costo de entrada al grupo a "
+            "<b>400 pesos mexicanos</b> (25% de descuento, aprox. <b>20 USD</b>).\n"
+            "🎯 <b>Válido para las primeras 10 personas</b> que realicen el pago.\n"
             "🧾 Una vez realizado el pago, se te agrega directamente al grupo premium.\n\n"
-            f"📝 Llena este formulario para registrarte y realizar el pago:\n"
+            "📝 Llena este formulario para registrarte y realizar el pago con el descuento:\n"
             f"<a href='{registro_url}'>{registro_url}</a>"
         )
         await query.edit_message_text(text=texto, parse_mode="HTML", reply_markup=main_menu_inline())
