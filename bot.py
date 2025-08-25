@@ -24,7 +24,8 @@ def normalizar(texto):
 # Menú principal
 def main_menu_inline():
     return InlineKeyboardMarkup([
-        [InlineKeyboardButton("📈 Información grupo premium", callback_data="info_premium")],
+        [InlineKeyboardButton("📈 Suscripción inmediata — Pago en línea", callback_data="info_premium")],
+        [InlineKeyboardButton("👨‍💼 Pago asistido — Enlace por asesor", callback_data="pago_asesor")],
         [InlineKeyboardButton("❓ Preguntas frecuentes", callback_data="preguntas_frecuentes")]
     ])
 
@@ -39,7 +40,13 @@ def faq_menu_inline():
 
 # /start
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("👋 ¿Cómo puedo ayudarte hoy?", reply_markup=main_menu_inline())
+    texto_home = (
+        "👋 ¿Cómo puedo ayudarte hoy?\n\n"
+        "Puedes elegir entre dos formas de suscripción al grupo premium:\n"
+        "• Inmediata en línea (por este bot).\n"
+        "• Asistida por un asesor (contacto directo)."
+    )
+    await update.message.reply_text(texto_home, reply_markup=main_menu_inline())
 
 # Botones Inline
 async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -53,13 +60,30 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"?notrack=true&telegram_id={user_id}"
         )
         texto = (
-            "👋 <b>Hola!</b>\n\n"
-            "💸 El costo de entrada al grupo es de <b>499 pesos mexicanos</b> (aproximadamente <b>25 USD</b>) mensuales.\n"
-            "🧾 Una vez realizado el pago, se te agrega directamente al grupo premium.\n\n"
-            f"📝 Llena este formulario para registrarte y realizar el pago:\n"
+            "🧾 <b>Suscripción inmediata — Pago en línea</b>\n\n"
+            "💸 Costo de entrada al grupo: <b>499 pesos mexicanos</b> (aprox. <b>25 USD</b>) mensuales.\n"
+            "🔒 Pago seguro en línea a través de nuestro formulario.\n"
+            "✅ Una vez acreditado el pago, se te agrega automáticamente al grupo premium.\n\n"
+            f"📝 Completa tu registro y realiza el pago en el siguiente enlace:\n"
             f"<a href='{registro_url}'>{registro_url}</a>"
         )
         await query.edit_message_text(text=texto, parse_mode="HTML", reply_markup=main_menu_inline())
+
+    elif query.data == "pago_asesor":
+        texto = (
+            "👨‍💼 <b>Pago asistido — Enlace por asesor</b>\n\n"
+            "💸 Costo de entrada al grupo: <b>499 pesos mexicanos</b> (aprox. <b>25 USD</b>) mensuales.\n"
+            "🔒 Es el mismo formulario seguro que en la suscripción inmediata.\n"
+            "👨‍💼 En este caso, un asesor te compartirá el enlace y resolverá cualquier duda.\n\n"
+            "Escríbele con el mensaje:\n"
+            "<i>“Quiero suscribirme al grupo premium.”</i>\n\n"
+            "En breve el asesor te atenderá."
+        )
+        reply = InlineKeyboardMarkup([
+            [InlineKeyboardButton("💬 Contactar asesor", url="https://t.me/mmsportplays")],
+            [InlineKeyboardButton("🔙 Menú principal", callback_data="volver_inicio")]
+        ])
+        await query.edit_message_text(text=texto, parse_mode="HTML", reply_markup=reply)
 
     elif query.data == "preguntas_frecuentes":
         await query.edit_message_text("❓ Selecciona una pregunta frecuente:", reply_markup=faq_menu_inline())
@@ -78,11 +102,23 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await query.edit_message_text(text=texto, parse_mode="HTML", reply_markup=faq_menu_inline())
 
     elif query.data == "volver_inicio":
-        await query.edit_message_text("👋 ¿Cómo puedo ayudarte hoy?", reply_markup=main_menu_inline())
+        texto_home = (
+            "👋 ¿Cómo puedo ayudarte hoy?\n\n"
+            "Puedes elegir entre dos formas de suscripción al grupo premium:\n"
+            "• Inmediata en línea (por este bot).\n"
+            "• Asistida por un asesor (contacto directo)."
+        )
+        await query.edit_message_text(text=texto_home, reply_markup=main_menu_inline())
 
 # Manejar mensajes de texto que no sean comandos
 async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("👋 ¿Cómo puedo ayudarte hoy?", reply_markup=main_menu_inline())
+    texto_home = (
+        "👋 ¿Cómo puedo ayudarte hoy?\n\n"
+        "Puedes elegir entre dos formas de suscripción al grupo premium:\n"
+        "• Inmediata en línea (por este bot).\n"
+        "• Asistida por un asesor (contacto directo)."
+    )
+    await update.message.reply_text(texto_home, reply_markup=main_menu_inline())
 
 # Ejecutar bot
 if __name__ == "__main__":
